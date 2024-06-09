@@ -1,50 +1,32 @@
 def prices(lines, option):
-    c_count = 0
-    s_count = 0
-    q_count = 0
+    counts = {'C': 0, 'S': 0, 'Q': 0}
+    sums = {'C': 0, 'S': 0, 'Q': 0}
+    max_prices = {'C': 0, 'S': 0, 'Q': 0}
+    min_prices = {'C': float('inf'), 'S': float('inf'), 'Q': float('inf')}
 
-    c_sum = 0
-    s_sum = 0
-    q_sum = 0
-
-    c_max = 0
-    q_max = 0
-    s_max = 0
-
-    c_min = 100000
-    s_min = 100000
-    q_min = 100000
     for line in lines:
         data = line.strip().split(',')
-        if float(data[-3]) == 0:
+        price = float(data[-3])
+        port = data[-1]
+
+        if price == 0:
             continue
-        else:
-            price = float(data[-3])
-        if data[-1] == 'C':
-            c_count += 1
-            c_sum += price
-            if price < c_min:
-                c_min = price
-            if price > c_max:
-                c_max = price
-        elif data[-1] == "S":
-            s_count += 1
-            s_sum += price
-            if price < s_min:
-                s_min = price
-            if price > s_max:
-                s_max = price
-        elif data[-1] == "Q":
-            q_count += 1
-            q_sum += price
-            if price < q_min:
-                q_min = price
-            if price > q_max:
-                q_max = price
-    if option == 0:
-        return [c_min, s_min, q_min]
-    elif option == 1:
-        return [c_max, s_max, q_max]
-    else:
-        return [round(c_sum/c_count,2) if c_sum != 0 else 0, round(s_sum/s_count,2) if s_sum != 0 else 0, \
-                round(q_sum/q_count,2) if q_sum != 0 else 0]
+
+        if port in counts:
+            counts[port] += 1
+            sums[port] += price
+            if price > max_prices[port]:
+                max_prices[port] = price
+            if price < min_prices[port]:
+                min_prices[port] = price
+
+    if option == 'min':
+        return [min_prices['C'], min_prices['S'], min_prices['Q']]
+    elif option == 'max':
+        return [max_prices['C'], max_prices['S'], max_prices['Q']]
+    elif option == 'avg':
+        return [
+            round(sums['C'] / counts['C'], 2) if counts['C'] != 0 else 0,
+            round(sums['S'] / counts['S'], 2) if counts['S'] != 0 else 0,
+            round(sums['Q'] / counts['Q'], 2) if counts['Q'] != 0 else 0
+        ]
